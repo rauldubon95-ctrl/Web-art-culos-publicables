@@ -208,4 +208,5 @@ export default async function HomePage() { // <--- Ahora es 'async' para verific
       </section>
     </section>
   );
-}
+  }
+  
