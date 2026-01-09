@@ -1,14 +1,12 @@
-import markdownStyles from "./markdown-styles.module.css";
-
 type Props = {
   content: string;
 };
 
 export function PostBody({ content }: Props) {
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="mx-auto max-w-3xl">
       <div
-        className={markdownStyles["markdown"]}
+        className="prose prose-zinc max-w-none prose-headings:scroll-mt-24"
         dangerouslySetInnerHTML={{ __html: content }}
       />
     </div>

@@ -54,11 +54,20 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
 
   const title = `${post.title} | Next.js Blog Example with ${CMS_NAME}`;
 
+  // Evita crash cuando ogImage no existe (o no trae url).
+  // Fallback: coverImage si existe; si no, no incluye imágenes.
+  const ogImages =
+    post.ogImage?.url
+      ? [post.ogImage.url]
+      : post.coverImage
+        ? [post.coverImage]
+        : [];
+
   return {
     title,
     openGraph: {
       title,
-      images: [post.ogImage.url],
+      images: ogImages,
     },
   };
 }
