@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Merriweather } from "next/font/google"; 
-import Link from "next/link"; // Importamos Link para la navegación
+import Link from "next/link"; 
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -30,12 +30,10 @@ export default function RootLayout({
         <div className="w-full h-1.5 bg-zinc-900 fixed top-0 left-0 z-50"></div>
 
         <div className="flex-1 flex justify-center py-8 md:py-12 px-4 sm:px-6">
-          {/* CONTENEDOR TIPO "REVISTA IMPRESA" */}
           <main className="w-full max-w-6xl bg-white shadow-2xl shadow-zinc-900/5 border border-zinc-200 flex flex-col relative mt-2">
             
-            {/* 2. BARRA DE NAVEGACIÓN GLOBAL */}
+            {/* 2. BARRA DE NAVEGACIÓN */}
             <nav className="border-b border-zinc-100 px-6 py-5 md:px-12 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white sticky top-0 z-10">
-              {/* Logo / Nombre */}
               <Link href="/" className="group">
                 <h1 className="font-serif text-2xl md:text-3xl font-black tracking-tight text-zinc-900 group-hover:text-zinc-700 transition-colors">
                   Cuadernos Abiertos
@@ -45,10 +43,13 @@ export default function RootLayout({
                 </p>
               </Link>
 
-              {/* Menú */}
-              <div className="flex flex-wrap gap-6 text-sm font-medium text-zinc-600">
+              <div className="flex flex-wrap items-center gap-6 text-sm font-medium text-zinc-600">
                 <Link href="/" className="hover:text-zinc-900 hover:underline decoration-zinc-400 underline-offset-4 transition-all">
                   Inicio
+                </Link>
+                {/* AQUÍ ESTABA FALTANDO: Enlace arriba también */}
+                <Link href="/equipo-editorial" className="hover:text-zinc-900 hover:underline decoration-zinc-400 underline-offset-4 transition-all">
+                  Equipo Editorial
                 </Link>
                 <Link href="/articulos" className="hover:text-zinc-900 hover:underline decoration-zinc-400 underline-offset-4 transition-all">
                   Archivo
@@ -59,12 +60,12 @@ export default function RootLayout({
               </div>
             </nav>
 
-            {/* 3. CONTENIDO PRINCIPAL (El "Children" es tu página actual) */}
+            {/* 3. CONTENIDO PRINCIPAL */}
             <div className="flex-1 px-6 py-10 md:px-16 md:py-14">
               {children}
             </div>
 
-            {/* 4. PIE DE PÁGINA PROFESIONAL */}
+            {/* 4. PIE DE PÁGINA */}
             <footer className="bg-zinc-50 border-t border-zinc-200 px-6 py-12 md:px-16 text-sm">
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="space-y-3">
@@ -79,7 +80,8 @@ export default function RootLayout({
                   <ul className="space-y-2 text-zinc-600">
                     <li><Link href="/normas" className="hover:underline">Normas de publicación</Link></li>
                     <li><Link href="/etica" className="hover:underline">Código de ética</Link></li>
-                    <li><Link href="/equipo" className="hover:underline">Equipo editorial</Link></li>
+                    {/* CORRECCIÓN CRÍTICA AQUÍ ABAJO: De /equipo a /equipo-editorial */}
+                    <li><Link href="/equipo-editorial" className="hover:underline">Equipo editorial</Link></li>
                   </ul>
                 </div>
 
