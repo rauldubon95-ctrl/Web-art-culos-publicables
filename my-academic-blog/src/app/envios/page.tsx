@@ -1,6 +1,7 @@
-"use client";
+"use client"; // Importante mantener esto
 
 import { useMemo, useState } from "react";
+import Link from "next/link"; // Usamos Link de Next.js para navegación rápida
 
 const SECCIONES = [
   "Tecnología y Sociedad",
@@ -65,219 +66,298 @@ export default function EnviosPage() {
   }
 
   return (
-    <section className="space-y-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Envíos</h1>
-        <p className="text-zinc-600 max-w-3xl">
-          <span className="font-medium">Cuadernos Abiertos</span> recibe manuscritos
-          de acceso público con rigor académico. Este formulario funciona para llevar registro:
-          recepción, revisión editorial y decisión.
+    <div className="animate-in fade-in duration-500">
+      {/* 1. ENCABEZADO ACADÉMICO */}
+      <header className="mb-10 border-b border-zinc-200 pb-8">
+        <h1 className="text-4xl font-serif font-bold text-zinc-900 tracking-tight">
+          Envío de Manuscritos
+        </h1>
+        <p className="mt-3 text-lg text-zinc-600 max-w-3xl leading-relaxed">
+          Bienvenido al sistema de gestión editorial de <span className="font-semibold text-zinc-800">Cuadernos Abiertos</span>. 
+          Utilice este portal para enviar nuevas contribuciones, rastrear el estado de su evaluación o acceder al panel de editores.
         </p>
       </header>
 
-      {/* Accesos rápidos */}
-      <div className="flex gap-3 flex-wrap">
-        <a
-          className="rounded-xl border px-4 py-2 hover:bg-zinc-50"
-          href="/envios/seguimiento"
+      {/* 2. BARRA DE NAVEGACIÓN (MEJORADA: TARJETAS DE ACCIÓN) */}
+      <div className="grid md:grid-cols-3 gap-4 mb-12">
+        {/* Tarjeta 1: Enviar (Activa) */}
+        <div className="rounded-xl border-2 border-zinc-900 bg-zinc-900 p-4 text-white shadow-lg">
+          <div className="flex items-center gap-3">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            <span className="font-semibold">Nuevo Envío</span>
+          </div>
+          <p className="text-xs text-zinc-300 mt-2">Formulario de recepción para autores.</p>
+        </div>
+
+        {/* Tarjeta 2: Seguimiento */}
+        <Link 
+          href="/envios/seguimiento" 
+          className="group rounded-xl border border-zinc-200 bg-white p-4 text-zinc-600 hover:border-zinc-400 hover:shadow-md transition-all"
         >
-          Seguimiento de envío
-        </a>
-        <a
-          className="rounded-xl border px-4 py-2 hover:bg-zinc-50"
-          href="/envios/panel"
+          <div className="flex items-center gap-3 group-hover:text-zinc-900">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <span className="font-semibold">Rastrear Artículo</span>
+          </div>
+          <p className="text-xs text-zinc-400 mt-2">Consulte el estado de su evaluación.</p>
+        </Link>
+
+        {/* Tarjeta 3: Panel Editorial */}
+        <Link 
+          href="/envios/panel" 
+          className="group rounded-xl border border-zinc-200 bg-white p-4 text-zinc-600 hover:border-zinc-400 hover:shadow-md transition-all"
         >
-          Panel editorial 
-        </a>
+          <div className="flex items-center gap-3 group-hover:text-zinc-900">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+            <span className="font-semibold">Acceso Editorial</span>
+          </div>
+          <p className="text-xs text-zinc-400 mt-2">Solo para revisores y editores.</p>
+        </Link>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        <aside className="lg:col-span-1 space-y-4">
-          <div className="rounded-2xl border p-5 space-y-3">
-            <div className="text-sm font-semibold">Requisitos mínimos</div>
-            <ul className="list-disc pl-5 text-sm text-zinc-700 space-y-1">
-              <li>Archivo {helper.pdf} o {helper.docx}.</li>
-              <li>Resumen y palabras clave (recomendado).</li>
-              <li>Datos completos de autoría y afiliación.</li>
-              <li>Declaración básica de originalidad.</li>
+      <div className="grid lg:grid-cols-12 gap-10">
+        
+        {/* 3. BARRA LATERAL (INFORMACIÓN) */}
+        <aside className="lg:col-span-4 space-y-6 order-2 lg:order-1">
+          <div className="bg-stone-50 rounded-2xl p-6 border border-stone-100">
+            <h3 className="font-serif font-bold text-zinc-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+              Requisitos previos
+            </h3>
+            <ul className="space-y-3 text-sm text-zinc-700">
+              <li className="flex items-start gap-2">
+                <span className="text-green-600 mt-0.5">✓</span>
+                Formato {helper.pdf} o {helper.docx}.
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-600 mt-0.5">✓</span>
+                Anonimizado (sin nombres en el archivo).
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-600 mt-0.5">✓</span>
+                Resumen de máx. 250 palabras.
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-600 mt-0.5">✓</span>
+                Bibliografía en formato APA 7.
+              </li>
             </ul>
           </div>
 
-          <div className="rounded-2xl border p-5 space-y-3">
-            <div className="text-sm font-semibold">Proceso editorial (resumen)</div>
-            <ol className="list-decimal pl-5 text-sm text-zinc-700 space-y-1">
-              <li>Recepción y acuse.</li>
-              <li>Revisión editorial (alcance y formato).</li>
-              <li>Evaluación por pares (si aplica).</li>
-              <li>Decisión: aceptado / cambios / rechazado.</li>
-              <li>Edición y publicación.</li>
+          <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm">
+            <h3 className="font-bold text-sm text-zinc-900 mb-3">Flujo Editorial</h3>
+            <ol className="relative border-l border-zinc-200 ml-2 space-y-6">
+              <li className="pl-4 relative">
+                <span className="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-zinc-300"></span>
+                <p className="text-sm font-medium text-zinc-900">1. Recepción</p>
+                <p className="text-xs text-zinc-500">Validación automática de formato.</p>
+              </li>
+              <li className="pl-4 relative">
+                <span className="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-zinc-300"></span>
+                <p className="text-sm font-medium text-zinc-900">2. Revisión Editorial</p>
+                <p className="text-xs text-zinc-500">Pertinencia y alcance.</p>
+              </li>
+              <li className="pl-4 relative">
+                <span className="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-zinc-300"></span>
+                <p className="text-sm font-medium text-zinc-900">3. Pares Ciegos</p>
+                <p className="text-xs text-zinc-500">Evaluación experta.</p>
+              </li>
             </ol>
-          </div>
-
-          <div className="rounded-2xl border p-5 text-sm text-zinc-700">
-            Nota: autenticación con Gmail (cuentas) y panel editorial con roles se implementa
-            en una fase posterior. En esta simulación, el envío queda registrado localmente
-            para pruebas.
           </div>
         </aside>
 
-        <div className="lg:col-span-2">
-          <div className="rounded-2xl border p-6 space-y-6">
-            <h2 className="text-xl font-semibold">Formulario de envío</h2>
-
-            {resultId ? (
-              <div className="rounded-xl border bg-zinc-50 p-4">
-                <div className="font-semibold">Envío recibido</div>
-                <div className="text-sm text-zinc-700 mt-1">
-                  Tu código de envío es: <span className="font-mono">{resultId}</span>
+        {/* 4. FORMULARIO PRINCIPAL */}
+        <div className="lg:col-span-8 order-1 lg:order-2">
+          <div className="bg-white rounded-2xl p-1"> {/* Contenedor blanco limpio */}
+            
+            {resultId && (
+              <div className="mb-8 rounded-xl border-l-4 border-green-500 bg-green-50 p-6 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="text-green-600 font-bold text-lg">¡Envío Recibido!</div>
                 </div>
-                <div className="text-sm text-zinc-600 mt-1">
-                  El equipo editorial se comunicará por correo una vez iniciada la revisión.
+                <p className="text-zinc-700 mt-2">Guarde su código de seguimiento:</p>
+                <div className="mt-3 bg-white border border-green-200 p-3 rounded-lg font-mono text-xl text-center tracking-widest text-zinc-800 select-all">
+                  {resultId}
                 </div>
               </div>
-            ) : null}
+            )}
 
-            {error ? (
-              <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-                {error}
+            {error && (
+              <div className="mb-8 rounded-xl border-l-4 border-red-500 bg-red-50 p-4 text-red-700">
+                <p className="font-bold">Error en el envío</p>
+                <p className="text-sm">{error}</p>
               </div>
-            ) : null}
+            )}
 
-            <form onSubmit={onSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Título del manuscrito *</label>
+            <form onSubmit={onSubmit} className="space-y-8">
+              {/* Sección: Detalles del Artículo */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-serif font-bold text-zinc-800 border-b pb-2">Información del Manuscrito</h2>
+                
+                <div className="grid gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 mb-1">Título del Artículo *</label>
+                    <input
+                      name="title"
+                      required
+                      className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition-colors"
+                      placeholder="Ej: Impacto de la IA en la educación superior..."
+                    />
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-700 mb-1">Sección Temática *</label>
+                      <select
+                        name="section"
+                        required
+                        className="w-full rounded-lg border border-zinc-300 px-4 py-3 bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
+                        defaultValue=""
+                      >
+                        <option value="" disabled>Seleccione una sección</option>
+                        {SECCIONES.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-700 mb-1">Tipo de Trabajo *</label>
+                      <select
+                        name="type"
+                        required
+                        className="w-full rounded-lg border border-zinc-300 px-4 py-3 bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
+                        defaultValue=""
+                      >
+                        <option value="" disabled>Seleccione el tipo</option>
+                        {TIPOS.map((t) => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 mb-1">Resumen / Abstract</label>
+                    <textarea
+                      name="abstract"
+                      rows={4}
+                      className="w-full rounded-lg border border-zinc-300 px-4 py-3 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
+                      placeholder="Breve descripción del contenido (Máx. 250 palabras)..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 mb-1">Palabras Clave</label>
+                    <input
+                      name="keywords"
+                      className="w-full rounded-lg border border-zinc-300 px-4 py-3 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
+                      placeholder="Separe con punto y coma (Ej: política; sociedad; datos)"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Sección: Autoría */}
+              <div className="space-y-6 pt-4">
+                <h2 className="text-xl font-serif font-bold text-zinc-800 border-b pb-2">Datos de Autoría</h2>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-zinc-700 mb-1">Lista completa de autores *</label>
+                    <input
+                      name="authors"
+                      required
+                      className="w-full rounded-lg border border-zinc-300 px-4 py-3 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
+                      placeholder="Apellido, Nombre; Apellido, Nombre..."
+                    />
+                    <p className="text-xs text-zinc-500 mt-1">Ingrese los nombres tal como deben aparecer en la citación.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 mb-1">Autor de correspondencia *</label>
+                    <input
+                      name="correspondingAuthor"
+                      required
+                      className="w-full rounded-lg border border-zinc-300 px-4 py-3 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 mb-1">Correo electrónico *</label>
+                    <input
+                      name="email"
+                      type="email"
+                      required
+                      className="w-full rounded-lg border border-zinc-300 px-4 py-3 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
+                    />
+                  </div>
+
+                   <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-zinc-700 mb-1">Afiliación Institucional</label>
+                    <input
+                      name="affiliation"
+                      className="w-full rounded-lg border border-zinc-300 px-4 py-3 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
+                      placeholder="Universidad o Centro de Investigación"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Sección: Archivos */}
+              <div className="space-y-6 pt-4">
+                <h2 className="text-xl font-serif font-bold text-zinc-800 border-b pb-2">Archivos y Declaraciones</h2>
+                
+                <div className="border-2 border-dashed border-zinc-300 rounded-xl p-8 text-center hover:bg-stone-50 transition-colors">
+                  <div className="mx-auto w-12 h-12 text-zinc-400 mb-3">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </div>
+                  <label className="block cursor-pointer">
+                    <span className="text-zinc-900 font-medium hover:underline">Haga clic para subir el archivo</span>
+                    <input
+                      name="file"
+                      type="file"
+                      required
+                      accept=".pdf,.docx"
+                      className="hidden"
+                    />
+                  </label>
+                  <p className="text-sm text-zinc-500 mt-2">Formatos aceptados: PDF o DOCX (Máx 10MB)</p>
+                </div>
+
+                <div className="flex items-start gap-3 bg-stone-50 p-4 rounded-lg">
                   <input
-                    name="title"
+                    id="originalidad"
+                    name="originalidad"
+                    type="checkbox"
                     required
-                    className="mt-1 w-full rounded-xl border px-3 py-2"
-                    placeholder="Título completo del artículo"
+                    className="mt-1 h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900"
                   />
+                  <label htmlFor="originalidad" className="text-sm text-zinc-700 cursor-pointer">
+                    Declaro formalmente que este manuscrito es original, no ha sido publicado previamente y no está bajo consideración en otra revista.
+                  </label>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium">Sección *</label>
-                  <select
-                    name="section"
-                    required
-                    className="mt-1 w-full rounded-xl border px-3 py-2 bg-white"
-                    defaultValue=""
+                <div className="pt-4 flex justify-end">
+                  <button
+                    disabled={loading}
+                    className="bg-zinc-900 text-white rounded-xl px-8 py-3 font-medium hover:bg-black shadow-lg shadow-zinc-200 disabled:opacity-70 disabled:cursor-not-allowed transition-all transform hover:-translate-y-0.5"
+                    type="submit"
                   >
-                    <option value="" disabled>Seleccionar</option>
-                    {SECCIONES.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Tipo de contribución *</label>
-                  <select
-                    name="type"
-                    required
-                    className="mt-1 w-full rounded-xl border px-3 py-2 bg-white"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>Seleccionar</option>
-                    {TIPOS.map((t) => (
-                      <option key={t} value={t}>{t}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Afiliación (opcional)</label>
-                  <input
-                    name="affiliation"
-                    className="mt-1 w-full rounded-xl border px-3 py-2"
-                    placeholder="Universidad / Centro / Organización"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Autores/as (lista) *</label>
-                  <input
-                    name="authors"
-                    required
-                    className="mt-1 w-full rounded-xl border px-3 py-2"
-                    placeholder="Apellido, Nombre; Apellido, Nombre; ..."
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Autor/a de correspondencia *</label>
-                  <input
-                    name="correspondingAuthor"
-                    required
-                    className="mt-1 w-full rounded-xl border px-3 py-2"
-                    placeholder="Apellido, Nombre"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="text-sm font-medium">Correo de contacto *</label>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    className="mt-1 w-full rounded-xl border px-3 py-2"
-                    placeholder="correo@dominio.com"
-                  />
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        Procesando...
+                      </span>
+                    ) : (
+                      "Enviar Manuscrito"
+                    )}
+                  </button>
                 </div>
               </div>
-
-              <div>
-                <label className="text-sm font-medium">Resumen (recomendado)</label>
-                <textarea
-                  name="abstract"
-                  rows={4}
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  placeholder="Resumen del manuscrito (150–250 palabras recomendado)"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">Palabras clave (recomendado)</label>
-                <input
-                  name="keywords"
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  placeholder="ej.: desinformación; esfera pública; plataformas; democracia"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">Archivo del manuscrito *</label>
-                <input
-                  name="file"
-                  type="file"
-                  required
-                  accept=".pdf,.docx"
-                  className="mt-1 w-full rounded-xl border px-3 py-2 bg-white"
-                />
-                <div className="text-xs text-zinc-500 mt-1">
-                  Formatos aceptados: PDF o DOCX. Evitar nombres con tildes/espacios.
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2">
-                <input id="originalidad" name="originalidad" type="checkbox" required className="mt-1" />
-                <label htmlFor="originalidad" className="text-sm text-zinc-700">
-                  Declaro que este manuscrito es original y que cualquier material de terceros está citado
-                  y referenciado de forma adecuada.
-                </label>
-              </div>
-
-              <button
-                disabled={loading}
-                className="rounded-xl border px-4 py-2 hover:bg-zinc-50 disabled:opacity-60"
-                type="submit"
-              >
-                {loading ? "Enviando..." : "Enviar manuscrito"}
-              </button>
             </form>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
