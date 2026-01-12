@@ -1,13 +1,40 @@
+// 1. CONFIGURACIÓN DEL MOTOR
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql" // Ya configurado para Neon (Nube)
   url      = env("DATABASE_URL")
 }
 
-// 1. El Usuario (Mejorado para Google + Roles)
+// 2. MODELO PARA LOS ARTÍCULOS (Vital para el formulario de envíos)
+model Submission {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  
+  // Datos del artículo
+  title       String
+  section     String
+  type        String?   // Nuevo
+  abstract    String?   // Nuevo
+  keywords    String?   // Nuevo
+  fileUrl     String?
+
+  // Datos del autor
+  authorName  String
+  email       String
+  affiliation String?   // Nuevo
+  correspondingAuthor String? // Nuevo
+
+  // Estado y Gestión
+  status         String   @default("recibido") // Usamos tus estados en español
+  editorialNotes String?  // Nuevo
+  reviewerNotes  String?  // Nuevo
+  reviewers      String?  // Nuevo
+}
+
+// 3. MODELOS DE AUTENTICACIÓN (User, Account, Session)
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -21,27 +48,25 @@ model User {
   sessions      Session[]
 }
 
-// 2. Cuenta (Aquí se guarda la conexión segura con Google)
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
-// 3. Sesión (Para saber quién está logueado sin pedir contraseña a cada rato)
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -50,7 +75,6 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// 4. Token de Verificación (Para seguridad extra en emails)
 model VerificationToken {
   identifier String
   token      String   @unique

@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "CA-MKB6ZWI6",
+    "createdAt": "2026-01-12T13:22:17.550Z",
+    "title": "La dialéctica de lo concreto",
+    "section": "Tecnología y Sociedad",
+    "type": "Artículo de investigación",
+    "authors": "Dubon Huezo, Raúl",
+    "correspondingAuthor": "José Raúl Dubón Huezo",
+    "email": "jraul.dubon@gmail.com",
+    "affiliation": "UEES",
+    "abstract": "Prueba",
+    "keywords": "Probando",
+    "fileName": "ca-mkb6zwi6-la-dialectica-de-lo-concreto.pdf",
+    "filePath": "uploads/ca-mkb6zwi6-la-dialectica-de-lo-concreto.pdf",
+    "status": "recibido",
+    "lastUpdatedAt": "2026-01-12T13:22:17.550Z",
+    "editorialNotes": "",
+    "reviewerNotes": "",
+    "reviewers": ""
+  }
+]
