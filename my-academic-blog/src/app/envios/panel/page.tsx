@@ -1,6 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSession, signIn } from "next-auth/react";
+
+/**
+ * LISTA BLANCA DE EDITORES
+ * Solo estos correos pueden entrar al panel
+ */
+const EDITORS = [
+  "tucorreo@gmail.com",
+  // agrega aquí más correos autorizados
+];
 
 const STATUSES = [
   { v: "recibido", t: "Recibido" },
@@ -13,7 +23,8 @@ const STATUSES = [
 ] as const;
 
 export default function PanelPage() {
-  const [key, setKey] = useState("");
+  const { data: session, status } = useSession();
+
   const [items, setItems] = useState<any[]>([]);
   const [selected, setSelected] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
@@ -26,197 +37,171 @@ export default function PanelPage() {
     return m;
   }, []);
 
+  const userEmail = session?.user?.email;
+
+  // 🔄 Cargar envíos solo si está autorizado
+  useEffect(() => {
+    if (status === "authenticated" && userEmail && EDITORS.includes(userEmail)) {
+      load();
+    }
+  }, [status, userEmail]);
+
   async function load() {
-    setLoading(true);
-    setErr(null);
-    setMsg(null);
     try {
+      setLoading(true);
       const res = await fetch("/api/envios", { cache: "no-store" });
       const json = await res.json();
-      if (!res.ok || !json?.ok) throw new Error(json?.error || "No se pudo cargar.");
+      if (!res.ok || !json?.ok) throw new Error(json?.error);
       setItems(json.items || []);
     } catch (e: any) {
-      setErr(e?.message || "Error.");
+      setErr(e.message);
     } finally {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    load();
-  }, []);
 
   async function save() {
     if (!selected) return;
-    setLoading(true);
-    setErr(null);
-    setMsg(null);
 
     try {
+      setLoading(true);
       const res = await fetch("/api/envios", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          key,
-          id: selected.id,
-          status: selected.status,
-          editorialNotes: selected.editorialNotes || "",
-          reviewerNotes: selected.reviewerNotes || "",
-          reviewers: selected.reviewers || "",
-        }),
+        body: JSON.stringify(selected),
       });
 
       const json = await res.json();
-      if (!res.ok || !json?.ok) throw new Error(json?.error || "No se pudo guardar.");
+      if (!res.ok || !json?.ok) throw new Error(json?.error);
 
-      setMsg("Actualizado.");
-      await load();
-
-      // refresca seleccionado desde lista
-      const refreshed = (items || []).find((x) => x.id === selected.id);
-      setSelected(refreshed || selected);
+      setMsg("Actualizado correctamente.");
+      load();
     } catch (e: any) {
-      setErr(e?.message || "Error.");
+      setErr(e.message);
     } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <section className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Panel editorial (demo)</h1>
-        <p className="text-zinc-600 max-w-3xl">
-          Gestión mínima de envíos: cambiar estado, registrar notas y asignaciones. Protección demo mediante clave.
-        </p>
-      </header>
+  /* ===============================
+     BLOQUEO DE ACCESO
+     =============================== */
 
-      <div className="rounded-2xl border p-5 grid md:grid-cols-3 gap-4 items-end">
-        <div className="md:col-span-2">
-          <label className="text-sm font-medium">Clave editorial</label>
-          <input
-            value={key}
-            onChange={(e) => setKey(e.target.value)}
-            className="mt-1 w-full rounded-xl border px-3 py-2"
-            placeholder="CAMBIAME-123 (demo)"
-          />
-          <div className="text-xs text-zinc-500 mt-1">
-            Para producción: OAuth + roles. En demo: se valida contra CA_ADMIN_KEY o "CAMBIAME-123".
-          </div>
-        </div>
+  if (status === "loading") {
+    return <div className="p-10">Cargando...</div>;
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="p-10 text-center">
+        <h2 className="text-xl font-semibold mb-4">
+          Acceso restringido
+        </h2>
         <button
-          onClick={load}
-          disabled={loading}
-          className="rounded-xl border px-4 py-2 hover:bg-zinc-50 disabled:opacity-60"
+          onClick={() => signIn("google")}
+          className="rounded-xl border px-4 py-2"
         >
-          {loading ? "Cargando..." : "Recargar"}
+          Iniciar sesión con Google
         </button>
       </div>
+    );
+  }
 
-      {err ? <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{err}</div> : null}
-      {msg ? <div className="rounded-xl border bg-zinc-50 p-4 text-sm text-zinc-700">{msg}</div> : null}
+  if (!userEmail || !EDITORS.includes(userEmail)) {
+    return (
+      <div className="p-10 text-center">
+        <h2 className="text-xl font-semibold text-red-600">
+          Acceso denegado
+        </h2>
+        <p>No tienes permisos para acceder al panel editorial.</p>
+      </div>
+    );
+  }
+
+  /* ===============================
+     PANEL EDITORIAL
+     =============================== */
+
+  return (
+    <section className="space-y-6">
+      <h1 className="text-3xl font-semibold">Panel editorial</h1>
+
+      {err && <div className="text-red-600">{err}</div>}
+      {msg && <div className="text-green-700">{msg}</div>}
+
+      <div className="text-sm text-zinc-600">
+        Sesión activa: {userEmail}
+      </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 space-y-3">
-          <div className="text-sm font-semibold">Envíos</div>
-          <div className="rounded-2xl border overflow-hidden">
-            {items.length === 0 ? (
-              <div className="p-4 text-sm text-zinc-700">Sin envíos.</div>
-            ) : (
-              <ul className="divide-y">
-                {items.map((it) => (
-                  <li key={it.id}>
-                    <button
-                      className="w-full text-left p-4 hover:bg-zinc-50"
-                      onClick={() => setSelected(it)}
-                    >
-                      <div className="text-xs text-zinc-500">{it.id}</div>
-                      <div className="font-medium">{it.title}</div>
-                      <div className="text-sm text-zinc-600">
-                        {statusLabel.get(it.status) || it.status}
-                      </div>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+        <div>
+          <h3 className="font-semibold mb-2">Envíos</h3>
+          <ul className="border rounded-xl divide-y">
+            {items.map((it) => (
+              <li key={it.id}>
+                <button
+                  className="w-full text-left p-3 hover:bg-zinc-50"
+                  onClick={() => setSelected(it)}
+                >
+                  <div className="text-sm font-medium">{it.title}</div>
+                  <div className="text-xs text-zinc-500">
+                    {statusLabel.get(it.status)}
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="lg:col-span-2">
-          <div className="rounded-2xl border p-6 space-y-4">
-            <h2 className="text-xl font-semibold">Detalle</h2>
+          {selected ? (
+            <div className="space-y-4 border p-6 rounded-xl">
+              <h2 className="text-xl font-semibold">{selected.title}</h2>
 
-            {!selected ? (
-              <div className="text-zinc-700">Seleccioná un envío para editar.</div>
-            ) : (
-              <>
-                <div className="text-sm text-zinc-500">{selected.id}</div>
-                <div className="text-lg font-semibold">{selected.title}</div>
-                <div className="text-sm text-zinc-700">
-                  <span className="font-medium">Autores:</span> {selected.authors}
-                </div>
-                <div className="text-sm text-zinc-700">
-                  <span className="font-medium">Correo:</span> {selected.email}
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Estado</label>
-                    <select
-                      className="mt-1 w-full rounded-xl border px-3 py-2 bg-white"
-                      value={selected.status}
-                      onChange={(e) => setSelected({ ...selected, status: e.target.value })}
-                    >
-                      {STATUSES.map((s) => (
-                        <option key={s.v} value={s.v}>{s.t}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium">Revisores (lista)</label>
-                    <input
-                      className="mt-1 w-full rounded-xl border px-3 py-2"
-                      placeholder='Nombre (correo); Nombre (correo)'
-                      value={selected.reviewers || ""}
-                      onChange={(e) => setSelected({ ...selected, reviewers: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Notas editoriales (visibles al autor en seguimiento)</label>
-                  <textarea
-                    rows={5}
-                    className="mt-1 w-full rounded-xl border px-3 py-2"
-                    value={selected.editorialNotes || ""}
-                    onChange={(e) => setSelected({ ...selected, editorialNotes: e.target.value })}
-                    placeholder="Ej.: En revisión editorial. Ajustar formato APA y estructura del resumen."
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Notas internas / revisión (no visibles al autor)</label>
-                  <textarea
-                    rows={5}
-                    className="mt-1 w-full rounded-xl border px-3 py-2"
-                    value={selected.reviewerNotes || ""}
-                    onChange={(e) => setSelected({ ...selected, reviewerNotes: e.target.value })}
-                    placeholder="Ej.: Comentarios de pares, criterios de decisión, observaciones internas."
-                  />
-                </div>
-
-                <button
-                  onClick={save}
-                  disabled={loading}
-                  className="rounded-xl border px-4 py-2 hover:bg-zinc-50 disabled:opacity-60"
+              <div>
+                <label className="text-sm font-medium">Estado</label>
+                <select
+                  className="mt-1 w-full border rounded p-2"
+                  value={selected.status}
+                  onChange={(e) =>
+                    setSelected({ ...selected, status: e.target.value })
+                  }
                 >
-                  {loading ? "Guardando..." : "Guardar cambios"}
-                </button>
-              </>
-            )}
-          </div>
+                  {STATUSES.map((s) => (
+                    <option key={s.v} value={s.v}>
+                      {s.t}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Notas editoriales</label>
+                <textarea
+                  className="mt-1 w-full border rounded p-2"
+                  rows={4}
+                  value={selected.editorialNotes || ""}
+                  onChange={(e) =>
+                    setSelected({
+                      ...selected,
+                      editorialNotes: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <button
+                onClick={save}
+                className="px-4 py-2 border rounded hover:bg-zinc-50"
+              >
+                Guardar cambios
+              </button>
+            </div>
+          ) : (
+            <div className="text-zinc-600">
+              Selecciona un envío para editar.
+            </div>
+          )}
         </div>
       </div>
     </section>
