@@ -8,40 +8,84 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 2. MODELO PARA LOS ARTÍCULOS
+// 2. MODELO DE NÚMEROS / EDICIONES (NUEVO)
+model Issue {
+  id          String   @id @default(cuid())
+  title       String   // Ej: "Vol. 1 - Dossier sobre IA"
+  description String?  @db.Text
+  coverImage  String?  // Portada del número completo
+  publishedAt DateTime @default(now())
+  isCurrent   Boolean  @default(false) // ¿Es el número actual en portada?
+  
+  submissions Submission[] // Los artículos que van dentro
+}
+
+// 3. MODELO PARA LOS ARTÍCULOS (MEJORADO)
 model Submission {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-   
-  // Datos del artículo
+  
+  // Datos Públicos (Lo que ve el lector)
   title        String
-  section      String
-  type         String?    
-  abstract     String?    
-  keywords     String?    
-  fileUrl      String?
+  slug         String?   @unique // Para la URL amigable (ej: "impacto-ia-sociedad")
+  abstract     String?   @db.Text
+  keywords     String?   
+  
+  // Archivos
+  fileUrl      String?   // El borrador original (Word/PDF del autor)
+  finalPdfUrl  String?   // EL PDF FINAL MAQUETADO (Para descargar)
+  contentHtml  String?   @db.Text // Versión lectura rápida (como tienes ahora)
 
-  // --- CAMPO NUEVO PARA MAQUETADO (Q1) ---
-  contentHtml  String?  @db.Text
-  // ---------------------------------------
+  // Metadatos
+  section      String    // Ej: "Artículos", "Reseñas"
+  type         String?   // Ej: "Investigación", "Ensayo"
+  
+  // Relación con Número (Dossier)
+  issueId      String?
+  issue        Issue?    @relation(fields: [issueId], references: [id])
 
   // Datos del autor
-  authorName   String
-  email        String
-  affiliation String?    
+  authorName          String
+  email               String
+  affiliation         String?   
   correspondingAuthor String? 
 
-  // Estado y Gestión
-  status         String    @default("recibido") 
-  editorialNotes String?  
-  reviewerNotes  String?  
+  // Estado y Gestión Interna
+  status         String   @default("recibido") 
+  editorialNotes String?  @db.Text
+  reviewerNotes  String?  @db.Text
   reviewers      String?  
 
-  // Relación con las Revisiones
   reviews        ReviewToken[]
 }
 
-// 3. MODELOS DE AUTENTICACIÓN
+// 4. SISTEMA DE ANALÍTICA AVANZADA (EL CEREBRO DE DATOS)
+
+// A. Contadores Rápidos (Para mostrar en el footer sin gastar recursos)
+model PostMetric {
+  slug      String   @id 
+  views     Int      @default(0)
+  downloads Int      @default(0)
+  lastView  DateTime @default(now())
+}
+
+// B. Registro Histórico (Para tus gráficas de Día/Mes/Año)
+model AnalyticsLog {
+  id        Int      @id @default(autoincrement())
+  slug      String   // Qué artículo vieron
+  type      String   // "view" o "download"
+  country   String?  // "SV", "MX"
+  createdAt DateTime @default(now()) // LA CLAVE: Fecha exacta del clic
+
+  @@index([createdAt]) // Para que las gráficas carguen rápido
+}
+
+model VisitorCountry {
+  code  String @id 
+  count Int    @default(1) 
+}
+
+// 5. MODELOS DE AUTENTICACIÓN (IGUAL QUE ANTES)
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -50,7 +94,6 @@ model User {
   image         String?
   role          String    @default("AUTHOR") 
   createdAt     DateTime  @default(now())
-
   accounts      Account[]
   sessions      Session[]
 }
@@ -90,38 +133,16 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// 4. MODELO PARA REVISIÓN POR PARES (Enlaces Mágicos)
 model ReviewToken {
-  id            String   @id @default(cuid())
-  token         String   @unique // El link secreto (ej: "xyz-123")
-
-  // Relación con el Artículo
-  submissionId  String
-  submission    Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-
-  // Datos del Revisor (Interno)
-  reviewerName  String?
+  id           String   @id @default(cuid())
+  token        String   @unique 
+  submissionId String
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  reviewerName String?
   reviewerEmail String?
-
-  // Resultado de la revisión
-  status        String   @default("pendiente") // "pendiente", "completado"
-  verdict       String?  // "aceptar", "cambios", "rechazar"
-  feedback      String?  @db.Text // Comentarios largos del experto
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-// ... (Tus modelos anteriores Submission, User, etc. siguen igual)
-
-// 5. SISTEMA DE ANALÍTICA REAL
-model PostMetric {
-  slug      String   @id // El identificador del artículo (ej: "ciencia-politica-desinformacion")
-  views     Int      @default(0)
-  downloads Int      @default(0)
-  lastView  DateTime @default(now())
-}
-
-model VisitorCountry {
-  code      String   @id // Código de país (ej: "SV", "MX", "ES")
-  count     Int      @default(1) // Cuántos visitantes de ese país
+  status       String   @default("pendiente") 
+  verdict      String?  
+  feedback     String?  @db.Text 
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
