@@ -1,7 +1,7 @@
 import Container from "@/app/_components/container";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 
-// ESTA LÍNEA OBLIGA A QUE LOS NÚMEROS SE ACTUALICEN SIEMPRE
 export const dynamic = 'force-dynamic';
 
 export default async function Footer() {
@@ -20,40 +20,52 @@ export default async function Footer() {
       countries: totalCountries
     };
   } catch (e) {
-    console.log("Esperando primeras métricas...");
+    console.log("Esperando métricas...");
   }
 
   return (
     <footer className="bg-white border-t border-zinc-200 mt-20 font-sans">
-      <div className="bg-zinc-900 text-white py-8 border-b border-zinc-800">
+      
+      {/* SECCIÓN DE MÉTRICAS INTERACTIVA */}
+      <div className="bg-zinc-900 text-white border-b border-zinc-800 transition-colors duration-300 hover:bg-zinc-950">
         <Container>
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              Impacto Global (Tiempo Real)
-            </div>
-            
-            <div className="flex gap-12 md:gap-20">
-               <div className="text-center group cursor-default">
-                 <span className="block font-serif font-bold text-3xl md:text-4xl text-white group-hover:text-zinc-300 transition">
-                    {stats.views.toLocaleString()}
-                 </span>
-                 <span className="text-[10px] uppercase tracking-widest text-zinc-500">Lecturas</span>
-               </div>
-               <div className="text-center group cursor-default">
-                 <span className="block font-serif font-bold text-3xl md:text-4xl text-white group-hover:text-zinc-300 transition">
-                    {stats.downloads.toLocaleString()}
-                 </span>
-                 <span className="text-[10px] uppercase tracking-widest text-zinc-500">Descargas</span>
-               </div>
-               <div className="text-center group cursor-default">
-                 <span className="block font-serif font-bold text-3xl md:text-4xl text-white group-hover:text-zinc-300 transition">
-                    {stats.countries}
-                 </span>
-                 <span className="text-[10px] uppercase tracking-widest text-zinc-500">Países</span>
-               </div>
-            </div>
-          </div>
+            <Link href="/estadisticas" className="block py-8 group cursor-pointer">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                
+                {/* Título con indicador */}
+                <div className="flex flex-col gap-1 text-center md:text-left">
+                    <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 flex items-center justify-center md:justify-start gap-2 group-hover:text-zinc-400 transition-colors">
+                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        Impacto Global
+                    </div>
+                    <div className="hidden md:flex text-xs text-zinc-600 group-hover:text-zinc-300 transition-colors items-center gap-1 mt-1">
+                        Ver reporte detallado <span className="transition-transform group-hover:translate-x-1">→</span>
+                    </div>
+                </div>
+                
+                {/* Los Números */}
+                <div className="flex gap-8 md:gap-20">
+                   <div className="text-center">
+                     <span className="block font-serif font-bold text-2xl md:text-4xl text-white group-hover:text-yellow-400 transition-colors">
+                        {stats.views.toLocaleString()}
+                     </span>
+                     <span className="text-[10px] uppercase tracking-widest text-zinc-500 group-hover:text-zinc-400">Lecturas</span>
+                   </div>
+                   <div className="text-center">
+                     <span className="block font-serif font-bold text-2xl md:text-4xl text-white group-hover:text-yellow-400 transition-colors">
+                        {stats.downloads.toLocaleString()}
+                     </span>
+                     <span className="text-[10px] uppercase tracking-widest text-zinc-500 group-hover:text-zinc-400">Descargas</span>
+                   </div>
+                   <div className="text-center">
+                     <span className="block font-serif font-bold text-2xl md:text-4xl text-white group-hover:text-yellow-400 transition-colors">
+                        {stats.countries}
+                     </span>
+                     <span className="text-[10px] uppercase tracking-widest text-zinc-500 group-hover:text-zinc-400">Países</span>
+                   </div>
+                </div>
+              </div>
+            </Link>
         </Container>
       </div>
 
