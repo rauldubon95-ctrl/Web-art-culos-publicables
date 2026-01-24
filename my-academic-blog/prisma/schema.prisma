@@ -12,28 +12,32 @@ datasource db {
 model Submission {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  
+   
   // Datos del artículo
-  title       String
-  section     String
-  type        String?   
-  abstract    String?   
-  keywords    String?   
-  fileUrl     String?
+  title        String
+  section      String
+  type         String?    
+  abstract     String?    
+  keywords     String?    
+  fileUrl      String?
+
+  // --- CAMPO NUEVO PARA MAQUETADO (Q1) ---
+  contentHtml  String?  @db.Text
+  // ---------------------------------------
 
   // Datos del autor
-  authorName  String
-  email       String
-  affiliation String?   
+  authorName   String
+  email        String
+  affiliation String?    
   correspondingAuthor String? 
 
   // Estado y Gestión
-  status         String   @default("recibido") 
+  status         String    @default("recibido") 
   editorialNotes String?  
   reviewerNotes  String?  
   reviewers      String?  
 
-  // Relación con las Revisiones (NUEVO)
+  // Relación con las Revisiones
   reviews        ReviewToken[]
 }
 
@@ -86,7 +90,7 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// 4. MODELO PARA REVISIÓN POR PARES (Enlaces Mágicos) - NUEVO
+// 4. MODELO PARA REVISIÓN POR PARES (Enlaces Mágicos)
 model ReviewToken {
   id            String   @id @default(cuid())
   token         String   @unique // El link secreto (ej: "xyz-123")
@@ -106,4 +110,18 @@ model ReviewToken {
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+// ... (Tus modelos anteriores Submission, User, etc. siguen igual)
+
+// 5. SISTEMA DE ANALÍTICA REAL
+model PostMetric {
+  slug      String   @id // El identificador del artículo (ej: "ciencia-politica-desinformacion")
+  views     Int      @default(0)
+  downloads Int      @default(0)
+  lastView  DateTime @default(now())
+}
+
+model VisitorCountry {
+  code      String   @id // Código de país (ej: "SV", "MX", "ES")
+  count     Int      @default(1) // Cuántos visitantes de ese país
 }

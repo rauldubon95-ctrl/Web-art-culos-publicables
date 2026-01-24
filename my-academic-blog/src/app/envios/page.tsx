@@ -1,7 +1,8 @@
-"use client"; // Importante mantener esto
+"use client"; 
 
 import { useMemo, useState } from "react";
-import Link from "next/link"; // Usamos Link de Next.js para navegación rápida
+import Link from "next/link"; 
+import { useSession } from "next-auth/react"; // <--- AGREGADO: Para detectar usuario
 
 const SECCIONES = [
   "Tecnología y Sociedad",
@@ -23,6 +24,7 @@ const TIPOS = [
 ];
 
 export default function EnviosPage() {
+  const { data: session } = useSession(); // <--- AGREGADO: Obtenemos datos de la sesión
   const [loading, setLoading] = useState(false);
   const [resultId, setResultId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -66,19 +68,41 @@ export default function EnviosPage() {
   }
 
   return (
-    <div className="animate-in fade-in duration-500">
-      {/* 1. ENCABEZADO ACADÉMICO */}
+    <div className="animate-in fade-in duration-500 font-sans">
+      
+      {/* 1. ENCABEZADO ACADÉMICO + PERFIL DE USUARIO */}
       <header className="mb-10 border-b border-zinc-200 pb-8">
-        <h1 className="text-4xl font-serif font-bold text-zinc-900 tracking-tight">
-          Envío de Manuscritos
-        </h1>
-        <p className="mt-3 text-lg text-zinc-600 max-w-3xl leading-relaxed">
-          Bienvenido al sistema de gestión editorial de <span className="font-semibold text-zinc-800">Cuadernos Abiertos</span>. 
-          Utilice este portal para enviar nuevas contribuciones, rastrear el estado de su evaluación o acceder al panel de editores.
-        </p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+                <h1 className="text-4xl font-serif font-bold text-zinc-900 tracking-tight">
+                Envío de Manuscritos
+                </h1>
+                <p className="mt-3 text-lg text-zinc-600 max-w-2xl leading-relaxed">
+                Gestión editorial de <span className="font-semibold text-zinc-800">Cuadernos Abiertos</span>.
+                </p>
+            </div>
+
+            {/* TARJETA DE USUARIO (SOLO SI ESTÁ LOGUEADO) */}
+            {session?.user && (
+                <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex items-center gap-4 shadow-sm min-w-[280px]">
+                    {session.user.image ? (
+                        <img src={session.user.image} alt="Avatar" className="w-12 h-12 rounded-full border border-zinc-300" />
+                    ) : (
+                        <div className="w-12 h-12 bg-zinc-800 text-white rounded-full flex items-center justify-center font-bold text-lg">
+                            {session.user.name?.charAt(0)}
+                        </div>
+                    )}
+                    <div>
+                        <p className="text-xs text-zinc-500 uppercase font-bold tracking-wider">Sesión Activa</p>
+                        <p className="text-sm font-bold text-zinc-900">{session.user.name}</p>
+                        <p className="text-xs text-zinc-500 truncate max-w-[150px]">{session.user.email}</p>
+                    </div>
+                </div>
+            )}
+        </div>
       </header>
 
-      {/* 2. BARRA DE NAVEGACIÓN (MEJORADA: TARJETAS DE ACCIÓN) */}
+      {/* 2. BARRA DE NAVEGACIÓN */}
       <div className="grid md:grid-cols-3 gap-4 mb-12">
         {/* Tarjeta 1: Enviar (Activa) */}
         <div className="rounded-xl border-2 border-zinc-900 bg-zinc-900 p-4 text-white shadow-lg">
@@ -167,7 +191,7 @@ export default function EnviosPage() {
 
         {/* 4. FORMULARIO PRINCIPAL */}
         <div className="lg:col-span-8 order-1 lg:order-2">
-          <div className="bg-white rounded-2xl p-1"> {/* Contenedor blanco limpio */}
+          <div className="bg-white rounded-2xl p-1">
             
             {resultId && (
               <div className="mb-8 rounded-xl border-l-4 border-green-500 bg-green-50 p-6 shadow-sm">
@@ -269,6 +293,8 @@ export default function EnviosPage() {
                       required
                       className="w-full rounded-lg border border-zinc-300 px-4 py-3 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
                       placeholder="Apellido, Nombre; Apellido, Nombre..."
+                      // Si hay sesión, sugerimos el nombre del usuario logueado
+                      defaultValue={session?.user?.name || ""}
                     />
                     <p className="text-xs text-zinc-500 mt-1">Ingrese los nombres tal como deben aparecer en la citación.</p>
                   </div>
@@ -279,6 +305,8 @@ export default function EnviosPage() {
                       name="correspondingAuthor"
                       required
                       className="w-full rounded-lg border border-zinc-300 px-4 py-3 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
+                      // Autocompletamos con el nombre del usuario
+                      defaultValue={session?.user?.name || ""}
                     />
                   </div>
 
@@ -289,6 +317,8 @@ export default function EnviosPage() {
                       type="email"
                       required
                       className="w-full rounded-lg border border-zinc-300 px-4 py-3 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
+                      // Autocompletamos con el email de Google
+                      defaultValue={session?.user?.email || ""}
                     />
                   </div>
 

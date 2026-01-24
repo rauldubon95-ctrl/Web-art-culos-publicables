@@ -9,11 +9,13 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "^5.10.2",
+    "@vercel/blob": "^2.0.1",
     "classnames": "^2.5.1",
     "date-fns": "^3.6.0",
     "gray-matter": "^4.0.3",
     "next": "latest",
     "next-auth": "^5.0.0-beta.30",
+    "nodemailer": "^7.0.12",
     "prisma": "^5.10.2",
     "react": "^19",
     "react-dom": "^19",
@@ -23,6 +25,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.8",
+    "@types/nodemailer": "^7.0.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.19",

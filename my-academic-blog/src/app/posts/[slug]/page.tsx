@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllPosts, getPostBySlug } from "@/lib/api";
-import { CMS_NAME } from "@/lib/constants";
 import markdownToHtml from "@/lib/markdownToHtml";
 import Container from "@/app/_components/container";
 import { PostBody } from "@/app/_components/post-body";
 import { PostHeader } from "@/app/_components/post-header";
+import { MetricTracker } from "@/app/_components/metric-tracker";
 
 export default async function Post(props: Params) {
   const params = await props.params;
@@ -20,10 +20,10 @@ export default async function Post(props: Params) {
   return (
     <main>
       <Container>
-        {/* ELIMINADO: <Header /> (El viejo título "Blog.") */}
-        {/* ELIMINADO: <Alert /> (La barra de "Preview mode" que estorbaba) */}
-        
-        <article className="mb-32 pt-8"> {/* Agregué pt-8 para separar un poco del menú */}
+        {/* RASTREADOR ACTIVO */}
+        <MetricTracker slug={post.slug} />
+
+        <article className="mb-32 pt-8">
           <PostHeader
             title={post.title}
             coverImage={post.coverImage}
@@ -51,7 +51,7 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
     return notFound();
   }
 
-  const title = `${post.title} | Cuadernos Abiertos`; // <--- CAMBIO: Puse el nombre real
+  const title = `${post.title} | Cuadernos Abiertos`;
 
   const ogImages =
     post.ogImage?.url
