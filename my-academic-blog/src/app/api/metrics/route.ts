@@ -10,6 +10,7 @@ export async function POST(req: Request) {
 
     if (!slug) return NextResponse.json({ error: "Falta slug" }, { status: 400 });
 
+    // 1. ACTUALIZAR LOS CONTADORES RÁPIDOS (Para el Footer)
     await prisma.postMetric.upsert({
       where: { slug },
       update: {
@@ -26,6 +27,7 @@ export async function POST(req: Request) {
 
     const country = req.headers.get("x-vercel-ip-country");
     
+    // 2. ACTUALIZAR CONTADOR DE PAÍSES (Para el Footer)
     if (country) {
       await prisma.visitorCountry.upsert({
         where: { code: country },
@@ -33,6 +35,17 @@ export async function POST(req: Request) {
         create: { code: country, count: 1 },
       });
     }
+
+    // 3. NUEVO: GRABAR EN EL HISTORIAL (Para tus Gráficas Futuras)
+    // Esto guarda fecha y hora exacta de cada visita
+    await prisma.analyticsLog.create({
+      data: {
+        slug: slug,
+        type: type || 'view',
+        country: country || 'unknown',
+        // createdAt se pone automático con la fecha de hoy
+      }
+    });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
