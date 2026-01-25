@@ -4,6 +4,7 @@ import { auth, signIn, signOut } from "@/auth";
 
 export const dynamic = "force-dynamic";
 
+// Función auxiliar para agrupar
 function groupBy<T extends Record<string, any>>(items: T[], key: string) {
   const out: Record<string, T[]> = {};
   for (const it of items) {
@@ -16,9 +17,21 @@ function groupBy<T extends Record<string, any>>(items: T[], key: string) {
 
 export default async function HomePage() {
   const session = await auth();
-  const posts = getAllPosts();
+  
+  // CORRECCIÓN AQUÍ: Pedimos explícitamente 'type' y 'section'
+  const posts = getAllPosts([
+    "title",
+    "date",
+    "slug",
+    "author",
+    "coverImage",
+    "excerpt",
+    "type",    // <--- Necesario para el filtro editorial
+    "section"  // <--- Necesario para el agrupamiento
+  ]);
 
-  // 1. Separar la Editorial (Busca un post que tenga type: "editorial" o usa el primero)
+  // 1. Separar la Editorial
+  // Ahora TypeScript no dará error porque 'type' ya existe en la interfaz Post
   const editorial = posts.find((p) => p.type === "editorial") || posts[0];
   
   // 2. El resto son artículos de investigación
@@ -32,10 +45,10 @@ export default async function HomePage() {
   return (
     <div className="grid lg:grid-cols-12 gap-12 font-serif text-zinc-900">
       
-      {/* COLUMNA IZQUIERDA: PORTADA (Ancho 8) */}
+      {/* COLUMNA IZQUIERDA: CONTENIDO PRINCIPAL (Ancho 8) */}
       <div className="lg:col-span-8 space-y-12">
         
-        {/* ENCABEZADO DEL NÚMERO */}
+        {/* A. ENCABEZADO DEL NÚMERO */}
         <header className="border-b-4 border-zinc-900 pb-6">
           <div className="flex justify-between items-end mb-4">
              <span className="font-sans text-xs font-bold uppercase tracking-widest text-zinc-500">
@@ -60,7 +73,34 @@ export default async function HomePage() {
           )}
         </header>
 
-        {/* TABLA DE CONTENIDOS (ARTÍCULOS) */}
+        {/* B. SECCIÓN: ICONOS INSTITUCIONALES */}
+        <section className="grid md:grid-cols-3 gap-4 font-sans">
+            <Link href="/directrices" className="group bg-zinc-50 hover:bg-zinc-900 border border-zinc-200 p-6 rounded-xl transition-all duration-300 flex flex-col items-center text-center">
+                <div className="mb-3 text-zinc-900 group-hover:text-white transition-colors">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                </div>
+                <h3 className="font-bold text-sm text-zinc-900 group-hover:text-white mb-1">Para Autores</h3>
+                <p className="text-xs text-zinc-500 group-hover:text-zinc-400 leading-snug">Normas de envío.</p>
+            </Link>
+
+            <Link href="/politica" className="group bg-zinc-50 hover:bg-zinc-900 border border-zinc-200 p-6 rounded-xl transition-all duration-300 flex flex-col items-center text-center">
+                <div className="mb-3 text-zinc-900 group-hover:text-white transition-colors">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
+                </div>
+                <h3 className="font-bold text-sm text-zinc-900 group-hover:text-white mb-1">Política Editorial</h3>
+                <p className="text-xs text-zinc-500 group-hover:text-zinc-400 leading-snug">Ética y Acceso.</p>
+            </Link>
+
+            <Link href="/reglamento" className="group bg-zinc-50 hover:bg-zinc-900 border border-zinc-200 p-6 rounded-xl transition-all duration-300 flex flex-col items-center text-center">
+                <div className="mb-3 text-zinc-900 group-hover:text-white transition-colors">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                </div>
+                <h3 className="font-bold text-sm text-zinc-900 group-hover:text-white mb-1">Reglamento</h3>
+                <p className="text-xs text-zinc-500 group-hover:text-zinc-400 leading-snug">Procesos internos.</p>
+            </Link>
+        </section>
+
+        {/* C. SUMARIO DE INVESTIGACIÓN */}
         <section>
           <h3 className="font-sans text-sm font-bold uppercase tracking-widest text-zinc-400 mb-8 border-b border-zinc-100 pb-2">
             Sumario de Investigación
@@ -84,7 +124,7 @@ export default async function HomePage() {
                       <div className="mt-1 font-sans text-sm text-zinc-500 flex gap-2">
                         <span className="font-semibold text-zinc-700">{post.author.name}</span>
                         <span>•</span>
-                        <span>{post.date}</span>
+                        <span>{new Date(post.date).toLocaleDateString()}</span>
                       </div>
                     </article>
                   ))}
@@ -96,7 +136,7 @@ export default async function HomePage() {
 
       </div>
 
-      {/* COLUMNA DERECHA: SIDEBAR (Ancho 4) */}
+      {/* COLUMNA DERECHA: SIDEBAR */}
       <aside className="lg:col-span-4 space-y-8 font-sans">
         
         {/* CAJA DE USUARIO */}
@@ -114,7 +154,7 @@ export default async function HomePage() {
                  </div>
               </div>
               <Link href="/envios/panel" className="block w-full text-center bg-purple-600 text-white text-sm font-bold py-2 rounded hover:bg-purple-700">
-                 Ir al Panel Editorial
+                  Ir al Panel Editorial
               </Link>
               <form action={async () => { "use server"; await signOut(); }}>
                 <button className="w-full text-center text-xs text-red-500 hover:underline mt-2">Cerrar Sesión</button>

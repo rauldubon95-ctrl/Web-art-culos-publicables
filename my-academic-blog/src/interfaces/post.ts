@@ -12,4 +12,8 @@ export type Post = {
   };
   content: string;
   preview?: boolean;
+  
+  // ✅ PROPIEDADES NUEVAS AGREGADAS (Solución del error)
+  type?: string;     // Define si es 'editorial', 'articulo', 'ensayo', etc.
+  section?: string;  // Define la categoría (ej: 'Tecnología y Sociedad')
 };
